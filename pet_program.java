@@ -439,7 +439,4 @@ public class pet_program {
         return response;
     }// end input string 
 
-    public static void test(){
-        System.out.println("test");
-    }
 }
