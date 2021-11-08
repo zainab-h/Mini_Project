@@ -19,234 +19,124 @@ class pet
 
 public class pet_program {
     public static void main(String[] args) {
+        pet pet1 = createPet();
+        setName(pet1, "Empty");
         int petCreated = 0;
-        pet pet = createPet();
-        setName(pet, "Empty");
-
-        //create empty array of 0 length
         String[] names = new String[0];
         String[] types = new String[0];
-        
+        int option;
+        String[] winOrLost = new String[0];
+        int level = 0;
+
+        //welcome to the game
         welcomeInfo();
-        int option = mainMenu(pet);
-        
-        //ensure the option they chose is valid
-        while ((option ==3)||(option ==2) && (petCreated ==0))
-        {
-            print("You need to create a pet first");
-            option = mainMenu(pet);
-        }
 
-        //allow the user to create a pet and store the data within an array of all pet names and types
-        if (option == 1)
+        //create pet as new to the game
+        if (petCreated ==0)
         {
-
-            pet = petSetUp(pet);
+            print("As this is your first time playing please create a pet");
+            pet1 = setUpPet(pet1);
             petCreated = petCreated + 1;
             //add data to array
-            names = appendToArray(names, getName(pet));
-            types = appendToArray(types, getType(pet));
-            //proceeds to run the game
-            helloMessage(pet);
+            names = appendToArray(names, getName(pet1));
+            types = appendToArray(types, getType(pet1));
+        }
+
+        //not new so can run main menu
+        option = mainMenu();
+        //4 means exit
+        while (!(option==4))
+        {
+
+            //odd case hence put first
+            if (option ==2)
+            {
+                seePets(names, types, petCreated);
+                option = mainMenu();
+            }
+
+            //create pet
+            if (option == 1)
+            {
+                pet1 = setUpPet(pet1);
+                petCreated = petCreated + 1;
+                //add data to array
+                names = appendToArray(names, getName(pet1));
+                types = appendToArray(types, getType(pet1));
+            }
+
+            //select pet
+            if (option==3)
+            {
+                int choice = selectPet(names, types, petCreated);
+                if (choice == -1)
+                {
+                    print("You entered the wrong pet name ");
+                    choice = selectPet(names, types, petCreated);
+                }
+                else
+                {
+                    String tempName = names[choice];
+                    String tempType = types[choice];
+                    setName(pet1, tempName);
+                    setType(pet1, tempType);
+                }
+            }
+
+            //run game
+            helloMessage(pet1);
             print("Proceeding to run the game.....");
             instructions();
-            level1(pet);
-            option = mainMenu(pet);
-
-        }
-        if (option ==2)
-        {
-            seePets(names, types, petCreated);
-            //select show pets
-        }
-        //allow the user to play the game once they select a pet name
-        if (option ==3)
-        {
-            int choice = selectPet(names, types, petCreated);
-            if (choice == -1)
-            {
-                print("You entered the wrong pet name ");
-                choice = selectPet(names, types, petCreated);
-            }
-            else
-            {
-                String tempName = names[choice];
-                String tempType = types[choice];
-                setName(pet, tempName);
-                setType(pet, tempType);
-            }
-            level1(pet);
+            level = level + 1;
+            winOrLost = runGame(pet1,winOrLost,level);
+            print(Arrays.toString(winOrLost));
+            option = mainMenu();
         }
         System.exit(0);
     }// END main
     
-    //returns the chosen pet picked by the user
-    public static int selectPet(String[] names, String[] types, int Count)
-    {
-        int temp = 0;
-        seePets(names, types, Count);
-        String choice = inputString("Enter which pet you want to play with");
 
-        for (int i = 0; i<Count; i++)
-        {
-            if (names[i].equals(choice))
-            {
-                return temp = i;
-            }
-        }
-        return temp = -1;
-    }
 
-    //allows string to be appended to end of array
-    public static String[] appendToArray (String[] oldArray, String newString)
-    {
-        String[] newArray = Arrays.copyOf(oldArray, oldArray.length+1);
-        newArray[oldArray.length] = newString;
-        return newArray;
-    }
 
-    //displays all current pets and their types
-    public static void seePets(String[] names, String[] types, int Count)
-    {
-        
-        for (int i = 0; i<Count; i++)
-        {
-            
-            System.out.println("Pet Name: " + names[i] + ", Species: " + types[i]);
-        }
-        return;
-    }
-
-    //create pet record
-    public static pet createPet()
-    {
-        pet pet1 = new pet();
-        return pet1;
-    }
-
-    //basic welcome to the game
-    public static void welcomeInfo()
-    {
-        print("**********************************************");
-        print("Hello!");
-        print("Welcome to my pet program!");
-        print("This is a simulation of a pet that you need to look after!");
-        print("You will have to make sure your pet is happy and not hungry so it can survive!");
-        print("If your pet dies you lose the game");
-        print("**********************************************");
-        print("\n");
-        
-        return;
-    }//END welcome info
-
+/* **********************************************************************
+    Methods for the game
+*/
     //alow the user to pick what they want to do
-    public static int mainMenu(pet pet1)
+    public static int mainMenu()
     {
         print("Main Menu: ");
-        int option = Integer.parseInt(inputString("Options 1: create pet " +
-                                             "\n" + "Options 2: see pets "+
-                                             "\n" + "Options 3: Play game"));       
+        int option = Integer.parseInt(inputString("Options 1: Create pet " +
+                                             "\n" + "Options 2: See pets "+
+                                             "\n" + "Options 3: Play game"+
+                                             "\n" + "Options 4: Exit game"));       
 
-        while ((option != 1) && (option != 2) && (option != 3) )
+        while ((option != 1) && (option != 2) && (option != 3)&& (option != 4) )
         {
-            option = Integer.parseInt(inputString("Options 1: create pet " +
-                                                    "\n" + "Options 2: see pets " +
-                                                    "\n" + "Options 3: Play game"));  
+            option = Integer.parseInt(inputString("Options 1: Create pet " +
+                                                    "\n" + "Options 2: See pets " +
+                                                    "\n" + "Options 3: Play game"+
+                                                    "\n" + "Options 4: Exit game"));  
         }
 
         return option;
     }
 
-    //creates an instance of a pet
-    public static pet petSetUp(pet pet1){
-        print("What type of pet do you want to create?");
-        String type = inputString("Please select from the following options: Dragon, Mermaid, Fairy (case sensitive)");
-        if (type.equals("Dragon") ||type.equals("Mermaid") ||type.equals("Fairy"))
-        {
-            String name = inputString("What do you want to name your pet? ");
-            setName(pet1, name);
-            setType(pet1, type);
-        }
-        else
-        {
-            print("Please enter correctly");
-            print("\n");
-            petSetUp(pet1);
-        }
-        return pet1;
-    }
-
-    //takes pet record as an argument and in this method calls it as petUpdateName
-    public static void setName(pet petUpdateName, String name)
-    {
-        petUpdateName.name = name;
-        return;
-    }// end procedure
-    
-    //returns pet name
-    public static String getName(pet pet)
-    {
-        return pet.name;
-    }// end procedure
-    
-    //returns pet type
-    public static String getType(pet pet)
-    {
-        return pet.species;
-    }// end procedure
-    
-    //sets the sepecifies of the pet
-    public static void setType(pet petUpdatetype, String type)
-    {
-        petUpdatetype.species = type;
-        return;
-    }// end procedure
-
-    //allows the pet to say hello to the user
-    public static void helloMessage(pet petDetails)
-    {   
-        print("\n");
-        print("***************************");
-        print(petDetails.name + " is born!");
-        print(petDetails.name + " is a " +petDetails.species + "!");
-        print("***************************");
-        print(petDetails.name + " says hello!");
-        print("***************************");
-        return;
-    }// end hello message
- 
-    //prints instructions for the rounds
-    public static void instructions(){
-        print("\n");
-        print("********Instructions**********");
-        print("Your pet will get hungry and fluctate in mood");
-        print("Its your job to make sure it is well fed and happy");
-        print("To do this you have to spend points on your pet");
-        print("Points are allocated at the start of the round and the round lasts for set amount of time");
-        print("Different rounds have different points and durations allocated");
-        print("If your pet is unhappy or hungry for 2 rounds straight you lose the game");
-        print("There are 5 rounds");
-        print("Goodluck");
-        print("\n");
-        return;
-    }
-
     //first level of the game 
-    public static void level1(pet pet1){
+    public static String[] runGame(pet pet1, String[] winOrLost, int level){
         boolean isUnhappy = false;
         boolean isHungry = false;
         boolean haveLost = false;
-
-        int count = 0;
-        final int ROUNDS = 2;
         Random dice = new Random();
-        
+        int count = 0;
+        //2-6
+        int rounds = dice.nextInt(4) + 2;
         int points = dice.nextInt(15) + 1;
 
-        print("Level 1");
-        for (int i = 1; i<=ROUNDS; i++)
-        {
-            print("Round: " +i);
+        print("Level: " + level);
+        for (int i = 1; i<=rounds; i++)
+        {   
+            print("Round: " +i+ " out of "+rounds);
+
             setHunger(pet1);
             setHappiness(pet1);
             isUnhappy = getHunger(pet1);
@@ -265,8 +155,8 @@ public class pet_program {
             {
                 haveLost = true;
             }
-            //loop for next round
-            print("\n");
+
+            
             changeState(pet1);
         }
 
@@ -276,19 +166,21 @@ public class pet_program {
         {
             print("You lost this level as your pet was hungry/happy for 2 rounds or more.");
             print("better luck next time");
+            winOrLost = appendToArray(winOrLost, "Lost");
         }
         else
         {
-            print("You won this round!");
+            print("You won this Level!");
+            winOrLost = appendToArray(winOrLost, "Won");
         }
         
-        return;
+        return winOrLost;
     }
 
     //checks to see if they have won or lost the round
     public static int checkState(boolean isUnhappy, boolean isHungry, int count, pet pet1)
     {
-        print("\n");
+        System.out.println("\n");
         isUnhappy = getHunger(pet1);
         isHungry = getHappiness(pet1);
         if (isUnhappy == true || isHungry == true)
@@ -301,6 +193,7 @@ public class pet_program {
             count = 0;
             print("You won this round");
         }
+        System.out.println("\n");
         return count;
     }
 
@@ -444,7 +337,67 @@ public class pet_program {
 
     }//END method
 
-    //procedure that randomly sets the pets hunger level
+    //returns the chosen pet picked by the user
+    public static int selectPet(String[] names, String[] types, int Count)
+    {
+        int temp = 0;
+        seePets(names, types, Count);
+        String choice = inputString("Enter which pet you want to play with");
+
+        for (int i = 0; i<Count; i++)
+        {
+            if (names[i].equals(choice))
+            {
+                return temp = i;
+            }
+        }
+        return temp = -1;
+    }
+
+
+    //displays all current pets and their types
+    public static void seePets(String[] names, String[] types, int Count)
+    {
+        for (int i = 0; i<Count; i++)
+        {
+            
+            System.out.println("Pet " + (i+1) + " - Name: " + names[i] + ", Species: " + types[i]);
+        }
+        return;
+    }
+
+
+/* **********************************************************************
+    Define an abstract data type of pet with operations:
+*/
+    //create empty pet record
+    public static pet createPet()
+    {
+        pet pet1 = new pet();
+        return pet1;
+    }
+
+    //fills pet record with details
+    public static pet setUpPet(pet pet1)
+    {
+        print("What type of pet do you want to create?");
+        String type = inputString("Please select from the following options: Dragon, Mermaid, Fairy (case sensitive)");
+        if (type.equals("Dragon") ||type.equals("Mermaid") ||type.equals("Fairy"))
+        {
+            String name = inputString("What do you want to name your pet? ");
+            setName(pet1, name);
+            setType(pet1, type);
+        }
+        else
+        {
+            print("Please enter correctly");
+            print("\n");
+            setUpPet(pet1);
+        }
+        return pet1;
+    }
+
+    // Given a pet return updated hunger level
     public static void setHunger(pet petHunger)
     {
         Random dice = new Random();
@@ -453,7 +406,7 @@ public class pet_program {
         return;
     }//END method
 
-    //procedure that randomly sets the pets happiness level
+    // Given a pet return updated happiness level
     public static void setHappiness(pet petHapppiness)
     {
         Random dice = new Random();
@@ -462,7 +415,7 @@ public class pet_program {
         return;
     }//END method
     
-    //method that displays the pets hunger level
+    // Given a pet return hunger level
     public static boolean getHunger(pet pet)
     {
         boolean isHungry = false; 
@@ -494,7 +447,7 @@ public class pet_program {
         return isHungry;
     }//END method
 
-    //method that displays the pets happiness level
+    // Given a pet return happiness level
     public static boolean getHappiness(pet pet)
     {
         boolean isUnhappy = false;
@@ -521,6 +474,87 @@ public class pet_program {
         return isUnhappy;
     }//END method
 
+    //given pet record and returns its name
+    public static String getName(pet pet)
+    {
+        return pet.name;
+    }// end procedure
+    
+    //given pet record and returns its type
+    public static String getType(pet pet)
+    {
+        return pet.species;
+    }// end procedure
+    
+    //given pet record and sets its type
+    public static void setType(pet petUpdatetype, String type)
+    {
+        petUpdatetype.species = type;
+        return;
+    }// end procedure
+
+    //given pet record and updates name
+    public static void setName(pet petUpdateName, String name)
+    {
+        petUpdateName.name = name;
+        return;
+    }// end procedure
+    
+
+
+/* **********************************************************************
+    Game basic info
+*/
+
+    //basic welcome to the game
+    public static void welcomeInfo()
+    {
+        print("**********************************************");
+        print("Hello!");
+        print("Welcome to my pet program!");
+        print("This is a simulation of a pet that you need to look after!");
+        print("You will have to make sure your pet is happy and not hungry so it can survive!");
+        print("If your pet dies you lose the game");
+        print("**********************************************");
+        print("\n");
+        
+        return;
+    }//END welcome info
+
+    //allows the pet to say hello to the user
+    public static void helloMessage(pet petDetails)
+    {   
+        print("\n");
+        print("***************************");
+        print(petDetails.name + " is born!");
+        print(petDetails.name + " is a " +petDetails.species + "!");
+        print("***************************");
+        print(petDetails.name + " says hello!");
+        print("***************************");
+        return;
+    }// end hello message
+ 
+    //prints instructions for the rounds
+    public static void instructions(){
+        print("\n");
+        print("********Instructions**********");
+        print("Your pet will get hungry and fluctate in mood");
+        print("Its your job to make sure it is well fed and happy");
+        print("To do this you have to spend points on your pet");
+        print("Points are allocated at the start of the round and the round lasts for set amount of time");
+        print("Different rounds have different points and durations allocated");
+        print("If your pet is unhappy or hungry for 2 rounds straight you lose the game");
+        print("There are 5 rounds");
+        print("Goodluck");
+        print("\n");
+        return;
+    }
+
+
+
+/* **********************************************************************
+   Operations that perform basic functions 
+*/
 
     //allows the user to enter yes or no and returns a boolean equivalent
     public static boolean decision(String message){
@@ -554,4 +588,12 @@ public class pet_program {
         return response;
     }// end input string 
 
+    //allows string to be appended to end of array
+    public static String[] appendToArray (String[] oldArray, String newString)
+    {
+        String[] newArray = Arrays.copyOf(oldArray, oldArray.length+1);
+        newArray[oldArray.length] = newString;
+        return newArray;
+    }
+    
 }
