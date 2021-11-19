@@ -1,6 +1,6 @@
 // Zainab Habib
-// 05/11/2021
-// VERSION  55
+// 08/11/2021
+// VERSION  1
 // pet program
 
 import java.util.Scanner;
@@ -25,7 +25,9 @@ public class pet_program {
         String[] names = new String[0];
         String[] types = new String[0];
         int option;
-        String[] winOrLost = new String[0];
+        String[] tempWinOrLost= new String[0];
+        String[] petNamesScoreBoard = new String[0];
+        String[] petScoresScoreBoard = new String[0];
         int level = 0;
 
         //welcome to the game
@@ -45,7 +47,7 @@ public class pet_program {
         //not new so can run main menu
         option = mainMenu();
         //4 means exit
-        while (!(option==4))
+        while (!(option==5))
         {
 
             //odd case hence put first
@@ -54,6 +56,14 @@ public class pet_program {
                 seePets(names, types, petCreated);
                 option = mainMenu();
             }
+
+            //if picked scoreboard and there are scores
+            if ((option ==4) && (petNamesScoreBoard.length != 0))
+            {
+                createScoreBoard(petNamesScoreBoard, petScoresScoreBoard);
+            }
+            print("Cant choose this option as no pets are created!");
+
 
             //create pet
             if (option == 1)
@@ -88,13 +98,123 @@ public class pet_program {
             print("Proceeding to run the game.....");
             instructions();
             level = level + 1;
-            winOrLost = runGame(pet1,winOrLost,level);
-            print(Arrays.toString(winOrLost));
+            tempWinOrLost = runGame(pet1,level);
+
+            petScoresScoreBoard = updateScore(petScoresScoreBoard, tempWinOrLost, petNamesScoreBoard);
+            petNamesScoreBoard = updateName(petNamesScoreBoard, tempWinOrLost);
+
             option = mainMenu();
+
+
         }
+        
         System.exit(0);
     }// END main
     
+
+    //updates the score array allowing numbers other than 0,1
+    public static String[] updateScore(String[] oldArray, String[] tempScore, String[] names)
+    {
+        boolean temp = false;
+        //data retrieved from the game round
+        String currentScore = tempScore[1];
+        String currentName = tempScore[0];
+        String [] newScore = new String[0];
+
+        //if no current scores create a new array
+        if (oldArray.length == 0)
+        {
+            newScore = appendToArray (oldArray, currentScore);
+            return newScore;
+        }
+        else
+        {
+            for (int i =0; i<oldArray.length;i++)
+            {
+                //if theres a match with current name and name already stored
+                if (names[i].equals(currentName))
+                {
+                    //increment the value
+                    int tempCurrent = Integer.parseInt(currentScore);
+                    int tempOld = Integer.parseInt(oldArray[i]);
+                    int tempAdd = tempCurrent + tempOld;
+                    oldArray[i] = Integer.toString(tempAdd);
+                    return oldArray;                     
+                }
+            }
+            //if there is no match in the 2 arrays
+            if (temp == false)
+            {
+                newScore = appendToArray (oldArray, currentScore);
+            }
+            
+        }
+        return newScore;
+    }
+
+    //update name array, only 1 instance
+    public static String[] updateName(String[] oldArray, String[] tempScore)
+    {
+        String newString = tempScore[0];
+        String [] name = new String[0];
+        
+        //if array has more than 0 names
+        if (oldArray.length!=0)
+        {
+            //run through current names
+            for (int i=0; i<oldArray.length; i++)
+            {
+                //if match no updates
+                if (newString.equals(oldArray[i]))
+                {
+                    return oldArray;
+                }
+            }
+        }
+        //if no names in the array OR no matches append current name and return name array
+        name = appendToArray (oldArray, newString);
+        return name;
+    }
+
+    public static void createScoreBoard(String[] names, String[] score)
+    {
+        //order by score
+        //loop array size
+        for(int i = 0; i<score.length; i++) 
+        {
+            //loops from current array index +1 to end of array
+            for (int j = i+1; j<score.length; j++) 
+            {
+                //compare current array element with the rest of the elements in the array
+                //bubble sort
+                if(score[i].compareToIgnoreCase(score[j])<0) 
+                {
+                    //swaps score if lower
+                    String temp = score[i];
+                    score[i] = score[j];
+                    score[j] = temp;
+    
+                    //if swap score need to swap name
+                    String tempName = names[i];
+                    names[i] = names[j];
+                    names[j] = tempName;
+                }
+             }
+        }
+        //debug
+        System.out.println(Arrays.toString(score));
+        System.out.println(Arrays.toString(names));
+    
+        //print scoreboard
+        System.out.println("****Scoreboard*******");
+        for(int i = 0; i<score.length; i++) 
+        {
+            System.out.println("Place " +(i+1)+ ": " + names[i] + " with a score of " + score[i]);
+        }
+        System.out.println("******************");
+        
+        return;
+    }
 
 
 
@@ -105,24 +225,28 @@ public class pet_program {
     public static int mainMenu()
     {
         print("Main Menu: ");
-        int option = Integer.parseInt(inputString("Options 1: Create pet " +
+        String option = (inputString("Options 1: Create pet " +
                                              "\n" + "Options 2: See pets "+
                                              "\n" + "Options 3: Play game"+
-                                             "\n" + "Options 4: Exit game"));       
+                                             "\n" + "Options 4: Show Scoreboard"+
+                                             "\n" + "Options 5: Exit game"));       
 
-        while ((option != 1) && (option != 2) && (option != 3)&& (option != 4) )
+        while (!(option.equals("1")) &&!(option.equals("2"))  && !(option.equals("3")) &&!(option.equals("4")) )
         {
-            option = Integer.parseInt(inputString("Options 1: Create pet " +
+            print("Enter a valid option");
+            option = (inputString("Options 1: Create pet " +
                                                     "\n" + "Options 2: See pets " +
                                                     "\n" + "Options 3: Play game"+
-                                                    "\n" + "Options 4: Exit game"));  
+                                                    "\n" + "Options 4: Show Scoreboard"+
+                                                    "\n" + "Options 5: Exit game"));    
         }
-
-        return option;
+        int temp = Integer.parseInt(option);
+        return temp;
     }
 
     //first level of the game 
-    public static String[] runGame(pet pet1, String[] winOrLost, int level){
+    public static String[] runGame(pet pet1, int level){
+        String[] winOrLost = new String[1];
         boolean isUnhappy = false;
         boolean isHungry = false;
         boolean haveLost = false;
@@ -166,12 +290,14 @@ public class pet_program {
         {
             print("You lost this level as your pet was hungry/happy for 2 rounds or more.");
             print("better luck next time");
-            winOrLost = appendToArray(winOrLost, "Lost");
+            winOrLost[0] = getName(pet1);
+            winOrLost[1] = "0";
         }
         else
         {
             print("You won this Level!");
-            winOrLost = appendToArray(winOrLost, "Won");
+            winOrLost[0] = getName(pet1);
+            winOrLost[1] = "1";
         }
         
         return winOrLost;
@@ -250,7 +376,7 @@ public class pet_program {
         }
         else if (enoughPoints(points)==false)
         {
-            print("You don't have enough points");
+            print("You don't have enough points.");
         }
         return points;
     }
@@ -285,12 +411,12 @@ public class pet_program {
         }
         else if (pointsUpdate<0)
         {
-            print("You cant feed your pet this many levels as you dont have enough points");
+            print("You cant feed your pet this many levels as you dont have enough points.");
             return oldPoints;
         }
         else
         {
-            print("You entered the wrong number");
+            print("You entered the wrong number.");
             return oldPoints;
         }
 
@@ -558,7 +684,7 @@ public class pet_program {
 
     //allows the user to enter yes or no and returns a boolean equivalent
     public static boolean decision(String message){
-        boolean yesOrNo = true;
+        boolean yesOrNo = false;
         String response = inputString(message);
         if ((response.equals("yes") || response.equals("Yes") || response.equals("YES")))
         {
